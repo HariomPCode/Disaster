@@ -8,6 +8,7 @@ app = FastAPI(title="Disaster Prediction API")
 # Allow frontend to access backend
 origins = [
     "http://localhost:3000",
+    "https://disaster-wheat-eight.vercel.app",
 ]
 
 app.add_middleware(
