@@ -341,6 +341,7 @@ export default function PredictPage() {
   const [magValue, setMagValue] = useState("");
   const [countryCode, setCountryCode] = useState(null); // numeric code
   const [countryName, setCountryName] = useState("");
+  const [city, setCity] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -357,10 +358,11 @@ export default function PredictPage() {
     setSelectedLocation(loc);
     setCountryCode(loc.country.code);
     setCountryName(loc.country.name);
+    setCity(loc.city || "");
     setLatitude(String(loc.latitude));
     setLongitude(String(loc.longitude));
     setToast({
-      message: `📍 ${loc.country.name} selected successfully`,
+      message: `📍 ${loc.country.name}${loc.city ? `, ${loc.city}` : ""} selected successfully`,
       type: "success",
     });
     setError(null);
@@ -370,6 +372,7 @@ export default function PredictPage() {
     setSelectedLocation(null);
     setCountryCode(null);
     setCountryName("");
+    setCity("");
     setLatitude("");
     setLongitude("");
   };
@@ -423,10 +426,11 @@ export default function PredictPage() {
     magScale !== null,
     magValue,
     countryCode !== null,
+    city,
     latitude,
     longitude,
   ].filter(Boolean).length;
-  const completionPct = Math.round((filledCount / 6) * 100);
+  const completionPct = Math.round((filledCount / 7) * 100);
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-start justify-center p-4 md:p-8 relative overflow-hidden">
@@ -485,7 +489,7 @@ export default function PredictPage() {
             <div className="flex items-center gap-2">
               <div className="text-right">
                 <p className="text-xs text-slate-500 font-medium">
-                  {filledCount}/6 fields
+                  {filledCount}/7 fields
                 </p>
                 <p className="text-xs text-emerald-400 font-mono">
                   {completionPct}%
@@ -635,6 +639,42 @@ export default function PredictPage() {
                   />
                 </div>
 
+                <div className="sm:col-span-1">
+                  <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    City
+                    {selectedLocation && (
+                      <span className="text-emerald-600 normal-case tracking-normal font-normal ml-1">
+                        (auto)
+                      </span>
+                    )}
+                  </label>
+                  <div
+                    className={`flex items-center rounded-xl border transition-all duration-200 ${
+                      city
+                        ? "border-slate-700/80 bg-slate-800/60"
+                        : "border-slate-800/80 bg-slate-800/40"
+                    } ${selectedLocation ? "pointer-events-none" : ""}`}
+                  >
+                    <div className="pl-3 text-slate-600">
+                      <MapPin className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="e.g. New Delhi"
+                      value={city}
+                      readOnly={!!selectedLocation}
+                      onChange={(e) => setCity(e.target.value)}
+                      className="w-full bg-transparent text-white text-sm px-3 py-3 rounded-xl outline-none placeholder:text-slate-600 font-mono"
+                    />
+                    {city && (
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 mr-3" />
+                    )}
+                  </div>
+                  <p className="text-slate-700 text-xs mt-1 pl-1">
+                    City name (front-end only)
+                  </p>
+                </div>
+
                 {/* Lat/Lng */}
                 {[
                   {
@@ -776,6 +816,7 @@ export default function PredictPage() {
               {[
                 { label: "Year", value: year },
                 { label: "Country", value: countryName },
+                { label: "City", value: city || "—" },
                 {
                   label: "Scale",
                   value:

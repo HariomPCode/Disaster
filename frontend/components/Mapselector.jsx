@@ -5,7 +5,6 @@ import { MapPin, Loader2, X, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { findCountryCode } from "@/json/country_mapping";
 
 // Dynamically loaded to avoid SSR issues with Leaflet
-let L;
 
 export default function MapSelector({
   onLocationSelect,
@@ -24,8 +23,7 @@ export default function MapSelector({
     if (mapInstanceRef.current) return;
 
     const init = async () => {
-      L = (await import("leaflet")).default;
-      await import("leaflet/dist/leaflet.css");
+      const L = (await import("leaflet")).default;
 
       // Fix default marker icons
       delete L.Icon.Default.prototype._getIconUrl;
@@ -97,8 +95,17 @@ export default function MapSelector({
             return;
           }
 
+          const cityName =
+            data?.address?.city ||
+            data?.address?.town ||
+            data?.address?.village ||
+            data?.address?.hamlet ||
+            data?.address?.municipality ||
+            "";
+
           onLocationSelect({
             country: match,
+            city: cityName,
             latitude: parseFloat(lat.toFixed(6)),
             longitude: parseFloat(lng.toFixed(6)),
             displayName: data?.display_name?.split(",").slice(0, 3).join(", "),
